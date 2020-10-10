@@ -1,0 +1,68 @@
+﻿<Window x:Class="ComputerGraphics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:ComputerGraphics"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1000">
+    <Window.Resources>
+        <RoutedUICommand x:Key="SelectOperationCommand" Text="Select operation" />
+        <RoutedUICommand x:Key="CreateObjectCommand" Text="Select operation" />
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command ="{StaticResource SelectOperationCommand}" Executed="SelectOperation" />
+        <CommandBinding Command ="{StaticResource CreateObjectCommand}" Executed="CreateObject" />
+    </Window.CommandBindings>
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open"/>
+                    <MenuItem Header="_Close"/>
+                    <MenuItem Header="_Save"/>
+                </MenuItem> 
+            </Menu>
+            <ToolBarTray DockPanel.Dock="Left" Orientation="Vertical">
+                <ToolBar>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource SelectOperationCommand}" CommandParameter="Select" ToolTip="Select the figure.">
+                        <Image Source="{StaticResource selectIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource SelectOperationCommand}" CommandParameter="Move" ToolTip="Move the figure.">
+                        <Image Source="{StaticResource moveIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource SelectOperationCommand}" CommandParameter="Resize" ToolTip="Change the figure size.">
+                        <Image Source="{StaticResource resizeIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource SelectOperationCommand}" CommandParameter="Rotate" ToolTip="Rotate the figure.">
+                        <Image Source="{StaticResource rotateIcon}" />
+                    </RadioButton>
+                    <Separator/>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource CreateObjectCommand}" CommandParameter="Line" ToolTip="Create a line.">
+                        <Image Source="{StaticResource lineIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource CreateObjectCommand}" CommandParameter="Rectangle" ToolTip="Create a rectangle">
+                        <Image Source="{StaticResource rectangleIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource CreateObjectCommand}" CommandParameter="Circle" ToolTip="Create a circle.">
+                        <Image Source="{StaticResource circleIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource CreateObjectCommand}" CommandParameter="BezierCurve" ToolTip="Create a bezier curve.">
+                        <Image Source="{StaticResource bezierCurveIcon}" />
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" Command="{StaticResource CreateObjectCommand}" CommandParameter="Polygon" ToolTip="Create a polygon.">
+                        <Image Source="{StaticResource polygonIcon}" />
+                    </RadioButton>
+                </ToolBar>
+            </ToolBarTray>
+            <Canvas x:Name="imageCanvas" MouseDown="Canvas_MouseDown" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" MinWidth="300" MaxWidth="600" Width="600" Height="750" Background="LightBlue"/>
+            <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Header="Property">
+                <Grid x:Name="rightPanel" Height="Auto" Width="Auto">
+                    
+                </Grid>
+            </GroupBox>
+            
+        </DockPanel>
+    </Grid>
+</Window>

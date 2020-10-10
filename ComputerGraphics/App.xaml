@@ -1,0 +1,19 @@
+﻿<Application x:Class="ComputerGraphics.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ComputerGraphics"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <BitmapImage x:Key="bezierCurveIcon" UriSource="./Icons/bezier-curve.png" />
+            <BitmapImage x:Key="circleIcon" UriSource="./Icons/circle.png" />
+            <BitmapImage x:Key="lineIcon" UriSource="./Icons/line.png" />
+            <BitmapImage x:Key="moveIcon" UriSource="./Icons/move.png" />
+            <BitmapImage x:Key="polygonIcon" UriSource="./Icons/polygon.png" />
+            <BitmapImage x:Key="rectangleIcon" UriSource="./Icons/rectangle.png" />
+            <BitmapImage x:Key="resizeIcon" UriSource="./Icons/resize.png" />
+            <BitmapImage x:Key="rotateIcon" UriSource="./Icons/rotate.png" />
+            <BitmapImage x:Key="selectIcon" UriSource="./Icons/select.png" />
+        </ResourceDictionary>
+        </Application.Resources>
+</Application>
