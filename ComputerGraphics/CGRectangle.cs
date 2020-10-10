@@ -20,9 +20,9 @@ namespace ComputerGraphics
 
         public double RectangleWidth {
             
-            get { return Rectangle.Width; }
+            get { return Rectangle.ActualWidth; }
             set{
-                if (Rectangle.Width != value)
+                if (Rectangle.ActualWidth != value)
                 {
                     Rectangle.Width = value;
                     OnPropertyChanged("RectangleWidth");
@@ -32,10 +32,10 @@ namespace ComputerGraphics
         public double RectangleHeight
         {
 
-            get { return Rectangle.Height; }
+            get { return Rectangle.ActualHeight; }
             set
             {
-                if (Rectangle.Height != value)
+                if (Rectangle.ActualHeight != value)
                 {
                     Rectangle.Height = value;
                     OnPropertyChanged("RectangleHeight");
@@ -74,6 +74,8 @@ namespace ComputerGraphics
         public CGRectangle(Rectangle shape) : base(shape)
         {
             Rectangle = (Rectangle)ObjectShape;
+            RectangleHeight = Rectangle.ActualHeight;
+            RectangleWidth = Rectangle.ActualWidth;
             generateGrid();
         }
 
