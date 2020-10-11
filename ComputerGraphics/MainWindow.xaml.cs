@@ -74,6 +74,22 @@ namespace ComputerGraphics
             switch (option.CommandParameter)
             {
                 case "Line":
+                    Line l = new Line();
+                    CGLine cgLine = new CGLine(l);
+                    objectsList.Add(cgLine);
+                    selectedObject = cgLine;
+                    //try
+                    //{
+                    //    rightPanel.Children.RemoveAt(0);
+                    //}
+                    //catch (ArgumentOutOfRangeException)
+                    //{
+                    //    ;
+                    //}
+                    //selectedObject.grid.UpdateLayout();
+                    //rightPanel.Children.Add(selectedObject.grid);
+                    //rightPanel.UpdateLayout();
+                    imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "Rectangle":
                     Rectangle r = new Rectangle();
