@@ -30,6 +30,11 @@ namespace ComputerGraphics
             InitializeComponent();
         }
 
+        public Canvas GetCanvas()
+        {
+            return imageCanvas;
+        }
+
         private void SelectOperation(object sender, RoutedEventArgs e)
         {
             ICommandSource option = (ICommandSource)e.OriginalSource;

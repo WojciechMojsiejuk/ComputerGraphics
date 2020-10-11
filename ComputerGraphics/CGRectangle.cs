@@ -16,8 +16,8 @@ namespace ComputerGraphics
     class CGRectangle : CGObject
     {
         private Rectangle Rectangle;
-        private Point StartingPoint;
-        private Point EndingPoint;
+        private Point startingPoint;
+        private Point endingPoint;
 
         public double RectangleWidth {
             
@@ -46,6 +46,38 @@ namespace ComputerGraphics
         Binding rectangleHeightBinding = new Binding("RectangleHeight");
         Binding rectangleWidthBinding = new Binding("RectangleWidth");
 
+        public Point StartingPoint
+        {
+
+            get { return startingPoint; }
+            set
+            {
+                if (startingPoint != value)
+                {
+                    startingPoint = value;
+                    OnPropertyChanged("StartingPointX");
+                    OnPropertyChanged("StartingPointY");
+                    Canvas.SetLeft(Rectangle, StartingPointX);
+                    Canvas.SetTop(Rectangle, StartingPointY);
+                }
+            }
+        }
+        public Point EndingPoint
+        {
+
+            get { return endingPoint; }
+            set
+            {
+                if (endingPoint != value)
+                {
+                    endingPoint = value;
+                    OnPropertyChanged("EndingPointX");
+                    OnPropertyChanged("EndingPointY");
+
+                }
+            }
+        }
+
         public double StartingPointX
         {
 
@@ -56,6 +88,8 @@ namespace ComputerGraphics
                 {
                     StartingPoint = new Point(value, StartingPoint.Y);
                     OnPropertyChanged("StartingPointX");
+                    Canvas.SetLeft(Rectangle, StartingPointX);
+                    Canvas.SetTop(Rectangle, StartingPointY);
                 }
             }
         }
@@ -70,6 +104,8 @@ namespace ComputerGraphics
                 {
                     StartingPoint = new Point(StartingPoint.X, value);
                     OnPropertyChanged("StartingPointY");
+                    Canvas.SetLeft(Rectangle, StartingPointX);
+                    Canvas.SetTop(Rectangle, StartingPointY);
                 }
             }
         }
@@ -83,6 +119,7 @@ namespace ComputerGraphics
                 {
                     EndingPoint = new Point(value, EndingPoint.Y);
                     OnPropertyChanged("EndingPointX");
+
                 }
             }
         }
@@ -137,8 +174,10 @@ namespace ComputerGraphics
             RectangleWidth = Rectangle.ActualWidth;
             StartingPointX = StartingPoint.X;
             StartingPointY = StartingPoint.Y;
+            StartingPoint = startingPoint;
             EndingPointX = EndingPoint.X;
             EndingPointY = EndingPoint.Y;
+            EndingPoint = endingPoint;
             generateGrid();
         }
 
