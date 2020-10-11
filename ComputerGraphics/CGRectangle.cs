@@ -25,8 +25,17 @@ namespace ComputerGraphics
             set{
                 if (Rectangle.ActualWidth != value)
                 {
-                    Rectangle.Width = value;
-                    OnPropertyChanged("RectangleWidth");
+                    if ((Operation.option != Operation.Option.Select) && (Operation.option != Operation.Option.Move))
+                    {
+                        Rectangle.Width = value;
+                        OnPropertyChanged("RectangleWidth");
+                    }
+                    if ((Operation.option == Operation.Option.Resize) && (EndingPointReferenceLock == false))
+                    {
+                        RectangleReferenceLock = true;
+                        EndingPoint = new Point(StartingPoint.X + Rectangle.ActualWidth, StartingPoint.Y + Rectangle.ActualHeight);
+                        RectangleReferenceLock = false;
+                    }
                 }
             }}
 
@@ -38,13 +47,27 @@ namespace ComputerGraphics
             {
                 if (Rectangle.ActualHeight != value)
                 {
-                    Rectangle.Height = value;
-                    OnPropertyChanged("RectangleHeight");
+                    if ((Operation.option != Operation.Option.Select) && (Operation.option != Operation.Option.Move))
+                    {
+                        Rectangle.Height = value;
+                        OnPropertyChanged("RectangleHeight");
+                    }
+                    if ((Operation.option == Operation.Option.Resize) && (EndingPointReferenceLock == false))
+                    {
+                        RectangleReferenceLock = true;
+                        EndingPoint = new Point(StartingPoint.X + Rectangle.ActualWidth, StartingPoint.Y + Rectangle.ActualHeight);
+                        RectangleReferenceLock = false;
+                    }
                 }
+                
             }
         }
         Binding rectangleHeightBinding = new Binding("RectangleHeight");
         Binding rectangleWidthBinding = new Binding("RectangleWidth");
+
+        public bool StartingPointReferenceLock { get; set; } = false;
+        public bool EndingPointReferenceLock { get; set; } = false;
+        public bool RectangleReferenceLock { get; set; } = false;
 
         public Point StartingPoint
         {
@@ -54,9 +77,25 @@ namespace ComputerGraphics
             {
                 if (startingPoint != value)
                 {
-                    startingPoint = value;
-                    OnPropertyChanged("StartingPointX");
-                    OnPropertyChanged("StartingPointY");
+                    if (Operation.option != Operation.Option.Select)
+                    {
+                        startingPoint = value;
+                        OnPropertyChanged("StartingPointX");
+                        OnPropertyChanged("StartingPointY");
+                    }
+                    if ((Operation.option == Operation.Option.Move) && (EndingPointReferenceLock == false))
+                    {
+                        StartingPointReferenceLock = true;
+                        EndingPoint = new Point(StartingPoint.X + Rectangle.Width, StartingPoint.Y + Rectangle.Height);
+                        StartingPointReferenceLock = false;
+                    }
+                    else if ((Operation.option == Operation.Option.Resize) && (RectangleReferenceLock == false))
+                    {
+                        EndingPointReferenceLock = true;
+                        RectangleWidth = EndingPoint.X - StartingPoint.X;
+                        RectangleHeight = EndingPoint.Y - StartingPoint.Y;
+                        EndingPointReferenceLock = false;
+                    }
                     Canvas.SetLeft(Rectangle, StartingPointX);
                     Canvas.SetTop(Rectangle, StartingPointY);
                 }
@@ -70,10 +109,25 @@ namespace ComputerGraphics
             {
                 if (endingPoint != value)
                 {
-                    endingPoint = value;
-                    OnPropertyChanged("EndingPointX");
-                    OnPropertyChanged("EndingPointY");
-
+                    if (Operation.option != Operation.Option.Select)
+                    {
+                        endingPoint = value;
+                        OnPropertyChanged("EndingPointX");
+                        OnPropertyChanged("EndingPointY");
+                    }
+                    if ((Operation.option == Operation.Option.Move) && (StartingPointReferenceLock == false))
+                    {
+                        EndingPointReferenceLock = true;
+                        StartingPoint = new Point(EndingPoint.X - Rectangle.Width, EndingPoint.Y - Rectangle.Height);
+                        EndingPointReferenceLock = false;
+                    }
+                    else if ((Operation.option == Operation.Option.Resize) && (RectangleReferenceLock == false))
+                    {
+                        EndingPointReferenceLock = true;
+                        RectangleWidth = EndingPoint.X - StartingPoint.X;
+                        RectangleHeight = EndingPoint.Y - StartingPoint.Y;
+                        EndingPointReferenceLock = false;
+                    }
                 }
             }
         }
@@ -87,9 +141,6 @@ namespace ComputerGraphics
                 if (StartingPoint.X != value)
                 {
                     StartingPoint = new Point(value, StartingPoint.Y);
-                    OnPropertyChanged("StartingPointX");
-                    Canvas.SetLeft(Rectangle, StartingPointX);
-                    Canvas.SetTop(Rectangle, StartingPointY);
                 }
             }
         }
@@ -103,9 +154,6 @@ namespace ComputerGraphics
                 if (StartingPoint.Y != value)
                 {
                     StartingPoint = new Point(StartingPoint.X, value);
-                    OnPropertyChanged("StartingPointY");
-                    Canvas.SetLeft(Rectangle, StartingPointX);
-                    Canvas.SetTop(Rectangle, StartingPointY);
                 }
             }
         }
@@ -118,8 +166,6 @@ namespace ComputerGraphics
                 if (EndingPoint.X != value)
                 {
                     EndingPoint = new Point(value, EndingPoint.Y);
-                    OnPropertyChanged("EndingPointX");
-
                 }
             }
         }
@@ -133,7 +179,6 @@ namespace ComputerGraphics
                 if (EndingPoint.Y != value)
                 {
                     EndingPoint = new Point(EndingPoint.X, value);
-                    OnPropertyChanged("EndingPointY");
                 }
             }
         }
@@ -143,14 +188,11 @@ namespace ComputerGraphics
         Binding endingPointXBinding = new Binding("EndingPointX");
         Binding endingPointYBinding = new Binding("EndingPointY");
 
-
-        
         public bool IsProcessed { get; set; } = false;
 
         RowDefinition gridRow1 = new RowDefinition();
         RowDefinition gridRow2 = new RowDefinition();
         RowDefinition gridRow3 = new RowDefinition();
-        RowDefinition gridRow4 = new RowDefinition();
 
         Label startingPointX = new Label();
         DoubleUpDown startingPointXValue = new DoubleUpDown();
@@ -310,7 +352,6 @@ namespace ComputerGraphics
             gridRow1.Height = new GridLength(30);
             gridRow2.Height = new GridLength(30);
             gridRow3.Height = new GridLength(30);
-            gridRow4.Height = new GridLength(30);
 
             startingPointXValue.Height = 30;
             startingPointYValue.Height = 30;
@@ -374,6 +415,7 @@ namespace ComputerGraphics
             Grid.SetRow(heightLabel, 2);
             Grid.SetRow(heightValue, 2);
 
+
             Grid.SetColumn(startingPointX, 0);
             Grid.SetColumn(startingPointY, 2);
             Grid.SetColumn(startingPointXValue, 1);
@@ -399,7 +441,6 @@ namespace ComputerGraphics
             grid.Children.Add(widthValue);
             grid.Children.Add(heightLabel);
             grid.Children.Add(heightValue);
-
         }
     }
 }

@@ -37,25 +37,32 @@ namespace ComputerGraphics
 
         private void SelectOperation(object sender, RoutedEventArgs e)
         {
-            ICommandSource option = (ICommandSource)e.OriginalSource;
-            System.Diagnostics.Debug.WriteLine(option.CommandParameter);
-            switch (option.CommandParameter)
+            try
             {
-                case "Select":
-                    Operation.option = Operation.Option.Select;
-                    break;
-                case "Move":
-                    Operation.option = Operation.Option.Move;
-                    break;
-                case "Resize":
-                    Operation.option = Operation.Option.Resize;
-                    break;
-                case "Rotate":
-                    Operation.option = Operation.Option.Rotate;
-                    break;
-                default:
-                    Operation.option = Operation.Option.Select;
-                    break;
+                RadioButton option = (RadioButton)e.OriginalSource;
+                System.Diagnostics.Debug.WriteLine(option.CommandParameter);
+                switch (option.CommandParameter)
+                {
+                    case "Select":
+                        Operation.option = Operation.Option.Select;
+                        break;
+                    case "Move":
+                        Operation.option = Operation.Option.Move;
+                        break;
+                    case "Resize":
+                        Operation.option = Operation.Option.Resize;
+                        break;
+                    case "Rotate":
+                        Operation.option = Operation.Option.Rotate;
+                        break;
+                    default:
+                        Operation.option = Operation.Option.Select;
+                        break;
+                }
+            }
+            catch(InvalidCastException ice)
+            {
+                System.Diagnostics.Debug.WriteLine(ice);
             }
         }
 
