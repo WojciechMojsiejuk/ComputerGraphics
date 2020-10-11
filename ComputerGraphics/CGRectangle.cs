@@ -15,8 +15,9 @@ namespace ComputerGraphics
 {
     class CGRectangle : CGObject
     {
-        public Rectangle Rectangle;
-
+        private Rectangle Rectangle;
+        private Point StartingPoint;
+        private Point EndingPoint;
 
         public double RectangleWidth {
             
@@ -45,8 +46,68 @@ namespace ComputerGraphics
         Binding rectangleHeightBinding = new Binding("RectangleHeight");
         Binding rectangleWidthBinding = new Binding("RectangleWidth");
 
-        public Point StartingPoint { get; set; }
-        public Point EndingPoint { get; set; }
+        public double StartingPointX
+        {
+
+            get { return StartingPoint.X; }
+            set
+            {
+                if (StartingPoint.X != value)
+                {
+                    StartingPoint = new Point(value, StartingPoint.Y);
+                    OnPropertyChanged("StartingPointX");
+                }
+            }
+        }
+
+        public double StartingPointY
+        {
+
+            get { return StartingPoint.Y; }
+            set
+            {
+                if (StartingPoint.Y != value)
+                {
+                    StartingPoint = new Point(StartingPoint.X, value);
+                    OnPropertyChanged("StartingPointY");
+                }
+            }
+        }
+        public double EndingPointX
+        {
+
+            get { return EndingPoint.X; }
+            set
+            {
+                if (EndingPoint.X != value)
+                {
+                    EndingPoint = new Point(value, EndingPoint.Y);
+                    OnPropertyChanged("EndingPointX");
+                }
+            }
+        }
+
+        public double EndingPointY
+        {
+
+            get { return EndingPoint.Y; }
+            set
+            {
+                if (EndingPoint.Y != value)
+                {
+                    EndingPoint = new Point(EndingPoint.X, value);
+                    OnPropertyChanged("EndingPointY");
+                }
+            }
+        }
+
+        Binding startingPointXBinding = new Binding("StartingPointX");
+        Binding startingPointYBinding = new Binding("StartingPointY");
+        Binding endingPointXBinding = new Binding("EndingPointX");
+        Binding endingPointYBinding = new Binding("EndingPointY");
+
+
+        
         public bool IsProcessed { get; set; } = false;
 
         RowDefinition gridRow1 = new RowDefinition();
@@ -69,13 +130,15 @@ namespace ComputerGraphics
         Label heightLabel = new Label();
         DoubleUpDown heightValue = new DoubleUpDown();
 
-
-
         public CGRectangle(Rectangle shape) : base(shape)
         {
             Rectangle = (Rectangle)ObjectShape;
             RectangleHeight = Rectangle.ActualHeight;
             RectangleWidth = Rectangle.ActualWidth;
+            StartingPointX = StartingPoint.X;
+            StartingPointY = StartingPoint.Y;
+            EndingPointX = EndingPoint.X;
+            EndingPointY = EndingPoint.Y;
             generateGrid();
         }
 
@@ -139,8 +202,8 @@ namespace ComputerGraphics
             IsProcessed = true;
             Canvas canvas = (Canvas)sender;
             StartingPoint = e.GetPosition(canvas);
-            Canvas.SetLeft(Rectangle, StartingPoint.X);
-            Canvas.SetTop(Rectangle, StartingPoint.Y);
+            Canvas.SetLeft(Rectangle, StartingPointX);
+            Canvas.SetTop(Rectangle, StartingPointY);
             canvas.Children.Add(Rectangle);
             return;
         }
@@ -160,9 +223,9 @@ namespace ComputerGraphics
             Canvas canvas = (Canvas)sender;
             EndingPoint = e.GetPosition(canvas);
 
-            if(EndingPoint.X <= StartingPoint.X)
+            if(EndingPointX <= StartingPointX)
             {
-                if (EndingPoint.Y <= StartingPoint.Y)
+                if (EndingPointY <= StartingPointY)
                 {
                     var pos = StartingPoint;
                     StartingPoint = EndingPoint;
@@ -178,7 +241,7 @@ namespace ComputerGraphics
             }
             else
             {
-                if (EndingPoint.Y <= StartingPoint.Y)
+                if (EndingPointY <= StartingPointY)
                 {
                     var temp1 = StartingPoint;
                     var temp2 = EndingPoint;
@@ -187,14 +250,14 @@ namespace ComputerGraphics
                 }
             }
 
-            var w = EndingPoint.X - StartingPoint.X;
-            var h = EndingPoint.Y - StartingPoint.Y;
+            var w = EndingPointX - StartingPointX;
+            var h = EndingPointY - StartingPointY;
 
             RectangleWidth = w;
             RectangleHeight = h;
 
-            Canvas.SetLeft(Rectangle, StartingPoint.X);
-            Canvas.SetTop(Rectangle, StartingPoint.Y);
+            Canvas.SetLeft(Rectangle, StartingPointX);
+            Canvas.SetTop(Rectangle, StartingPointY);
 
             return;
         }
@@ -224,13 +287,40 @@ namespace ComputerGraphics
             widthLabel.Content = "Width:";
             heightLabel.Content = "Height:";
 
-            rectangleHeightBinding.Source = RectangleHeight;
-            rectangleWidthBinding.Source = RectangleWidth;
+            rectangleHeightBinding.Source = this;
+            rectangleWidthBinding.Source = this;
             rectangleHeightBinding.Mode = BindingMode.TwoWay;
             rectangleWidthBinding.Mode = BindingMode.TwoWay;
+            rectangleHeightBinding.NotifyOnSourceUpdated = true;
+            rectangleWidthBinding.NotifyOnSourceUpdated = true;
+            rectangleHeightBinding.NotifyOnTargetUpdated = true;
+            rectangleWidthBinding.NotifyOnTargetUpdated = true;
+
+            startingPointXBinding.Source = this;
+            startingPointYBinding.Source = this;
+            startingPointXBinding.Mode = BindingMode.TwoWay;
+            startingPointYBinding.Mode = BindingMode.TwoWay;
+            startingPointXBinding.NotifyOnSourceUpdated = true;
+            startingPointYBinding.NotifyOnSourceUpdated = true;
+            startingPointXBinding.NotifyOnTargetUpdated = true;
+            startingPointYBinding.NotifyOnTargetUpdated = true;
+
+            endingPointXBinding.Source = this;
+            endingPointYBinding.Source = this;
+            endingPointXBinding.Mode = BindingMode.TwoWay;
+            endingPointYBinding.Mode = BindingMode.TwoWay;
+            endingPointXBinding.NotifyOnSourceUpdated = true;
+            endingPointYBinding.NotifyOnSourceUpdated = true;
+            endingPointXBinding.NotifyOnTargetUpdated = true;
+            endingPointYBinding.NotifyOnTargetUpdated = true;
 
             heightValue.SetBinding(DoubleUpDown.ValueProperty, rectangleHeightBinding);
             widthValue.SetBinding(DoubleUpDown.ValueProperty, rectangleWidthBinding);
+
+            endingPointXValue.SetBinding(DoubleUpDown.ValueProperty, endingPointXBinding);
+            endingPointYValue.SetBinding(DoubleUpDown.ValueProperty, endingPointYBinding);
+            startingPointXValue.SetBinding(DoubleUpDown.ValueProperty, startingPointXBinding);
+            startingPointYValue.SetBinding(DoubleUpDown.ValueProperty, startingPointYBinding);
 
             Grid.SetRow(startingPointX, 0);
             Grid.SetRow(startingPointY, 0);
