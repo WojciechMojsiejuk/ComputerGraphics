@@ -38,7 +38,6 @@ namespace ComputerGraphics
                     }
                 }
             }}
-
         public double RectangleHeight
         {
 
@@ -64,11 +63,9 @@ namespace ComputerGraphics
         }
         Binding rectangleHeightBinding = new Binding("RectangleHeight");
         Binding rectangleWidthBinding = new Binding("RectangleWidth");
-
         public bool StartingPointReferenceLock { get; set; } = false;
         public bool EndingPointReferenceLock { get; set; } = false;
         public bool RectangleReferenceLock { get; set; } = false;
-
         public Point StartingPoint
         {
 
@@ -142,7 +139,6 @@ namespace ComputerGraphics
                 }
             }
         }
-
         public double StartingPointX
         {
 
@@ -155,7 +151,6 @@ namespace ComputerGraphics
                 }
             }
         }
-
         public double StartingPointY
         {
 
@@ -180,7 +175,6 @@ namespace ComputerGraphics
                 }
             }
         }
-
         public double EndingPointY
         {
 
@@ -194,31 +188,7 @@ namespace ComputerGraphics
             }
         }
 
-        Binding startingPointXBinding = new Binding("StartingPointX");
-        Binding startingPointYBinding = new Binding("StartingPointY");
-        Binding endingPointXBinding = new Binding("EndingPointX");
-        Binding endingPointYBinding = new Binding("EndingPointY");
-
         public bool IsProcessed { get; set; } = false;
-
-        RowDefinition gridRow1 = new RowDefinition();
-        RowDefinition gridRow2 = new RowDefinition();
-        RowDefinition gridRow3 = new RowDefinition();
-
-        Label startingPointX = new Label();
-        DoubleUpDown startingPointXValue = new DoubleUpDown();
-        Label startingPointY = new Label();
-        DoubleUpDown startingPointYValue = new DoubleUpDown();
-
-        Label endingPointX = new Label();
-        DoubleUpDown endingPointXValue = new DoubleUpDown();
-        Label endingPointY = new Label();
-        DoubleUpDown endingPointYValue = new DoubleUpDown();
-
-        Label widthLabel = new Label();
-        DoubleUpDown widthValue = new DoubleUpDown();
-        Label heightLabel = new Label();
-        DoubleUpDown heightValue = new DoubleUpDown();
 
         public CGRectangle(Rectangle shape) : base(shape)
         {
@@ -334,27 +304,7 @@ namespace ComputerGraphics
 
         public override void generateGrid()
         {
-            grid.RowDefinitions.Add(gridRow1);
-            grid.RowDefinitions.Add(gridRow2);
-            grid.RowDefinitions.Add(gridRow3);
-
-            gridRow1.Height = new GridLength(30);
-            gridRow2.Height = new GridLength(30);
-            gridRow3.Height = new GridLength(30);
-
-            startingPointXValue.Height = 30;
-            startingPointYValue.Height = 30;
-            endingPointXValue.Height = 30;
-            endingPointYValue.Height = 30;
-            widthValue.Height = 30;
-            heightValue.Height = 30;
-
-            startingPointX.Content = "Start X:";
-            startingPointY.Content = "Start Y:";
-            endingPointX.Content = "End X:";
-            endingPointY.Content = "End Y:";
-            widthLabel.Content = "Width:";
-            heightLabel.Content = "Height:";
+            base.generateGrid();
 
             rectangleHeightBinding.Source = this;
             rectangleWidthBinding.Source = this;
