@@ -74,7 +74,6 @@ namespace ComputerGraphics
             grid.ColumnDefinitions.Add(gridCol2);
             grid.ColumnDefinitions.Add(gridCol3);
             grid.ColumnDefinitions.Add(gridCol4);
-
         }
 
         public virtual void generateGrid()
@@ -117,9 +116,6 @@ namespace ComputerGraphics
             ObjectShape.Stroke = inactiveObjectColor;
             IsSelected = false;
         }
-
-       
-
         public CGObject selectMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (IsSelected)

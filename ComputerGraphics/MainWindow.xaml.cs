@@ -110,13 +110,26 @@ namespace ComputerGraphics
                     imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "Circle":
-                    Operation.option = Operation.Option.Resize;
+                    Ellipse ellipse = new Ellipse();
+                    CGEllipse cGEllipse = new CGEllipse(ellipse);
+                    objectsList.Add(cGEllipse);
+                    selectedObject = cGEllipse;
+                    try
+                    {
+                        rightPanel.Children.RemoveAt(0);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        ;
+                    }
+                    selectedObject.grid.UpdateLayout();
+                    rightPanel.Children.Add(selectedObject.grid);
+                    rightPanel.UpdateLayout();
+                    imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "BezierCurve":
-                    Operation.option = Operation.Option.Rotate;
                     break;
                 case "Polygon":
-                    Operation.option = Operation.Option.Create;
                     break;
                 default:
                     Operation.option = Operation.Option.Select;
