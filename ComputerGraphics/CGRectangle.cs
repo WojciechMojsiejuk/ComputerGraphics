@@ -23,7 +23,7 @@ namespace ComputerGraphics
             
             get { return Rectangle.ActualWidth; }
             set{
-                if (Rectangle.ActualWidth != value)
+                if ((Rectangle.ActualWidth != value) && (value >= 0))
                 {
                     if ((Operation.option != Operation.Option.Select) && (Operation.option != Operation.Option.Move))
                     {
@@ -45,7 +45,7 @@ namespace ComputerGraphics
             get { return Rectangle.ActualHeight; }
             set
             {
-                if (Rectangle.ActualHeight != value)
+                if ((Rectangle.ActualHeight != value) && (value>=0))
                 {
                     if ((Operation.option != Operation.Option.Select) && (Operation.option != Operation.Option.Move))
                     {
@@ -96,6 +96,12 @@ namespace ComputerGraphics
                         RectangleHeight = EndingPoint.Y - StartingPoint.Y;
                         EndingPointReferenceLock = false;
                     }
+                    else if (Operation.option == Operation.Option.Create)
+                    {
+                        RectangleWidth = EndingPointX - StartingPointX;
+                        RectangleHeight = EndingPointY - StartingPointY;
+                    }
+
                     Canvas.SetLeft(Rectangle, StartingPointX);
                     Canvas.SetTop(Rectangle, StartingPointY);
                 }
@@ -107,7 +113,7 @@ namespace ComputerGraphics
             get { return endingPoint; }
             set
             {
-                if (endingPoint != value)
+                if ((endingPoint != value))
                 {
                     if (Operation.option != Operation.Option.Select)
                     {
@@ -127,6 +133,11 @@ namespace ComputerGraphics
                         RectangleWidth = EndingPoint.X - StartingPoint.X;
                         RectangleHeight = EndingPoint.Y - StartingPoint.Y;
                         EndingPointReferenceLock = false;
+                    }
+                    else if (Operation.option == Operation.Option.Create)
+                    {
+                        RectangleWidth = EndingPointX - StartingPointX;
+                        RectangleHeight = EndingPointY - StartingPointY;
                     }
                 }
             }
@@ -235,32 +246,50 @@ namespace ComputerGraphics
 
         public override void moveMouseDown(object sender, MouseButtonEventArgs e)
         {
+            IsProcessed = true;
+            Canvas canvas = (Canvas)sender;
+            StartingPoint = e.GetPosition(canvas);
             return;
         }
 
         public override void moveMouseUp(object sender, MouseButtonEventArgs e)
         {
+            IsProcessed = false;
             return;
         }
 
         public override void moveMouseMove(object sender, MouseEventArgs e)
         {
-            return;
+            if (!IsProcessed)
+            {
+                return;
+            }
+            Canvas canvas = (Canvas)sender;
+            StartingPoint = e.GetPosition(canvas);
         }
 
         public override void resizeMouseDown(object sender, MouseButtonEventArgs e)
         {
+            IsProcessed = true;
+            Canvas canvas = (Canvas)sender;
+            EndingPoint = e.GetPosition(canvas);
             return;
         }
 
         public override void resizeMouseUp(object sender, MouseButtonEventArgs e)
         {
+            IsProcessed = false;
             return;
         }
 
         public override void resizeMouseMove(object sender, MouseEventArgs e)
         {
-            return;
+            if (!IsProcessed)
+            {
+                return;
+            }
+            Canvas canvas = (Canvas)sender;
+            EndingPoint = e.GetPosition(canvas);
         }
 
         public override void rotateMouseDown(object sender, MouseButtonEventArgs e)
@@ -283,9 +312,6 @@ namespace ComputerGraphics
             IsProcessed = true;
             Canvas canvas = (Canvas)sender;
             StartingPoint = e.GetPosition(canvas);
-            Canvas.SetLeft(Rectangle, StartingPointX);
-            Canvas.SetTop(Rectangle, StartingPointY);
-            canvas.Children.Add(Rectangle);
             return;
         }
 
@@ -303,43 +329,6 @@ namespace ComputerGraphics
             }
             Canvas canvas = (Canvas)sender;
             EndingPoint = e.GetPosition(canvas);
-
-            if(EndingPointX <= StartingPointX)
-            {
-                if (EndingPointY <= StartingPointY)
-                {
-                    var pos = StartingPoint;
-                    StartingPoint = EndingPoint;
-                    EndingPoint = pos;
-                }
-                else
-                {
-                    var temp1 = StartingPoint;
-                    var temp2 = EndingPoint;
-                    StartingPoint = new Point(temp2.X, temp1.Y);
-                    EndingPoint = new Point(temp1.X, temp2.Y); ;
-                }
-            }
-            else
-            {
-                if (EndingPointY <= StartingPointY)
-                {
-                    var temp1 = StartingPoint;
-                    var temp2 = EndingPoint;
-                    StartingPoint = new Point(temp1.X, temp2.Y);
-                    EndingPoint = new Point(temp2.X, temp1.Y); ;
-                }
-            }
-
-            var w = EndingPointX - StartingPointX;
-            var h = EndingPointY - StartingPointY;
-
-            RectangleWidth = w;
-            RectangleHeight = h;
-
-            Canvas.SetLeft(Rectangle, StartingPointX);
-            Canvas.SetTop(Rectangle, StartingPointY);
-
             return;
         }
 

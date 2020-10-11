@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -39,7 +40,7 @@ namespace ComputerGraphics
         {
             try
             {
-                RadioButton option = (RadioButton)e.OriginalSource;
+                ICommandSource option = (ICommandSource)e.OriginalSource;
                 System.Diagnostics.Debug.WriteLine(option.CommandParameter);
                 switch (option.CommandParameter)
                 {
@@ -68,7 +69,7 @@ namespace ComputerGraphics
 
         private void CreateObject(object sender, RoutedEventArgs e)
         {
-            RadioButton option = (RadioButton)e.OriginalSource;
+            ICommandSource option = (ICommandSource)e.OriginalSource;
             System.Diagnostics.Debug.WriteLine(option.CommandParameter);
             switch (option.CommandParameter)
             {
@@ -79,7 +80,18 @@ namespace ComputerGraphics
                     CGRectangle obj = new CGRectangle(r);
                     objectsList.Add(obj);
                     selectedObject = obj;
-                    option.IsChecked = false;
+                    try
+                    {
+                        rightPanel.Children.RemoveAt(0);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        ;
+                    }
+                    selectedObject.grid.UpdateLayout();
+                    rightPanel.Children.Add(selectedObject.grid);
+                    rightPanel.UpdateLayout();
+                    imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "Circle":
                     Operation.option = Operation.Option.Resize;
