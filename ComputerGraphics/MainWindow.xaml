@@ -9,19 +9,23 @@
         Title="MainWindow" Height="800" Width="1000">
     <Window.Resources>
         <RoutedUICommand x:Key="SelectOperationCommand" Text="Select operation" />
-        <RoutedUICommand x:Key="CreateObjectCommand" Text="Select operation" />
+        <RoutedUICommand x:Key="CreateObjectCommand" Text="Create figure" />
+        <RoutedUICommand x:Key="OpenFileCommand" Text="OpenFile" />
+        <RoutedUICommand x:Key="SaveFileCommand" Text="SaveFile" />
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command ="{StaticResource SelectOperationCommand}" Executed="SelectOperation" />
         <CommandBinding Command ="{StaticResource CreateObjectCommand}" Executed="CreateObject" />
+        <CommandBinding Command ="{StaticResource OpenFileCommand}" Executed="OpenFile" />
+        <CommandBinding Command ="{StaticResource SaveFileCommand}" Executed="SaveFile" />
     </Window.CommandBindings>
     <Grid>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open"/>
+                    <MenuItem Header="_Open" Command="{StaticResource OpenFileCommand}"/>
+                    <MenuItem Header="_Save" Command="{StaticResource SaveFileCommand}"/>
                     <MenuItem Header="_Close"/>
-                    <MenuItem Header="_Save"/>
                 </MenuItem> 
             </Menu>
             <ToolBarTray DockPanel.Dock="Left" Orientation="Vertical">
@@ -56,7 +60,9 @@
                     </RadioButton>
                 </ToolBar>
             </ToolBarTray>
-            <Canvas x:Name="imageCanvas" MouseDown="Canvas_MouseDown" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" MinWidth="300" MaxWidth="600" Width="600" Height="750" Background="LightBlue"/>
+            <Viewbox Stretch="Uniform">
+                <Canvas x:Name="imageCanvas" MouseDown="Canvas_MouseDown" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" Width="auto" Height="auto" Background="LightBlue"/>
+            </Viewbox>
             <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Header="Property">
                 <Grid x:Name="rightPanel" Height="Auto" Width="Auto">
                     

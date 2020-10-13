@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,8 +25,25 @@ namespace ComputerGraphics
     {
         private CGObject selectedObject = null;
         private List<CGObject> objectsList = new List<CGObject>();
+        private BitmapImage bitmapImage;
+        public BitmapImage BitmapImg
+        {
+            get
+            {
+                return bitmapImage;
+            }
+            set
+            {
+                bitmapImage = value;
+                ImageBrush brush = new ImageBrush();
+                imageCanvas.Width = bitmapImage.Width;
+                imageCanvas.Height = bitmapImage.Height;
+                brush.ImageSource = bitmapImage;
+                imageCanvas.Background = brush;
+            }
+        }
 
-        
+
         public MainWindow()
         {
             
@@ -34,6 +53,96 @@ namespace ComputerGraphics
         public Canvas GetCanvas()
         {
             return imageCanvas;
+        }
+
+        private void OpenFile(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory;
+            openFileDialog.Filter = "Image files (*.jpg)|*.jpg|PPM files (*.ppm*)|*.ppm*";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var fileExtension = System.IO.Path.GetExtension(openFileDialog.FileName);
+                switch(fileExtension)
+                {
+                    case ".ppm":
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".JPG":
+                    case ".JPEG":
+                        OpenJpegFile(openFileDialog.FileName);
+                        break;
+                    default:
+                        MessageBox.Show("Wrong file extension", "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+                }
+            }
+
+        }
+        private void SaveFile(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Environment.CurrentDirectory;
+            saveFileDialog.Filter = "Image files (*.jpg)|*.jpg";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                var fileExtension = System.IO.Path.GetExtension(saveFileDialog.FileName);
+                switch (fileExtension)
+                {
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".JPG":
+                    case ".JPEG":
+                        try 
+                        {
+                            SaveJpegFile(saveFileDialog.FileName);
+                        }   
+                        catch(InvalidDataException ide)
+                            {
+                            MessageBox.Show(ide.ToString(), "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        break;
+                    default:
+                        MessageBox.Show("Wrong file extension", "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        break;
+                }
+            }
+
+        }
+
+        private void OpenJpegFile(string fileName)
+        {
+            BitmapImg = new BitmapImage(new Uri(fileName, UriKind.Relative));
+        }
+
+        private void SaveJpegFile(string fileName)
+        {
+            if (BitmapImg == null)
+                throw new InvalidDataException("No file to save.");
+
+            SelectImageQualityDialog imgQualityDialog = new SelectImageQualityDialog();
+            if (imgQualityDialog.ShowDialog() == true)
+            {
+                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(BitmapImg));
+                encoder.QualityLevel = (int)imgQualityDialog.qualitySlider.Value;
+                using (var fileStream = new FileStream(fileName, System.IO.FileMode.Create))
+                {
+                    try 
+                    {
+                        encoder.Save(fileStream);
+                    }
+                    catch(Exception e)
+                    {
+                        MessageBox.Show(e.ToString(), "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No file compression quality selected", "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SelectOperation(object sender, RoutedEventArgs e)
@@ -110,13 +219,26 @@ namespace ComputerGraphics
                     imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "Circle":
-                    Operation.option = Operation.Option.Resize;
+                    Ellipse ellipse = new Ellipse();
+                    CGEllipse cGEllipse = new CGEllipse(ellipse);
+                    objectsList.Add(cGEllipse);
+                    selectedObject = cGEllipse;
+                    try
+                    {
+                        rightPanel.Children.RemoveAt(0);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        ;
+                    }
+                    selectedObject.grid.UpdateLayout();
+                    rightPanel.Children.Add(selectedObject.grid);
+                    rightPanel.UpdateLayout();
+                    imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "BezierCurve":
-                    Operation.option = Operation.Option.Rotate;
                     break;
                 case "Polygon":
-                    Operation.option = Operation.Option.Create;
                     break;
                 default:
                     Operation.option = Operation.Option.Select;
