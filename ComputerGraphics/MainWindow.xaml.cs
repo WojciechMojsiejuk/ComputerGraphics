@@ -66,6 +66,7 @@ namespace ComputerGraphics
                 switch(fileExtension)
                 {
                     case ".ppm":
+                        OpenPPMFile(openFileDialog.FileName);
                         break;
                     case ".jpg":
                     case ".jpeg":
@@ -80,6 +81,13 @@ namespace ComputerGraphics
             }
 
         }
+
+        private void OpenPPMFile(string fileName)
+        {
+            PPMReader ppmReader= new PPMReader(fileName);
+            BitmapImg = ppmReader.readPPM3();
+        }
+
         private void SaveFile(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();

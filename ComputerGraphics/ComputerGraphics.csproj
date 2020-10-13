@@ -75,6 +75,7 @@
     <Compile Include="CGEllipse.cs" />
     <Compile Include="CGLine.cs" />
     <Compile Include="CGObject.cs" />
+    <Compile Include="PPMReader.cs" />
     <Compile Include="SelectImageQualityDialog.xaml.cs">
       <DependentUpon>SelectImageQualityDialog.xaml</DependentUpon>
     </Compile>
@@ -116,6 +117,14 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="PPMFiles\ppm-test-01-p3.ppm" />
+    <None Include="PPMFiles\ppm-test-02-p3-comments.ppm" />
+    <None Include="PPMFiles\ppm-test-03-p6.ppm" />
+    <None Include="PPMFiles\ppm-test-04-p3-16bit.ppm" />
+    <None Include="PPMFiles\ppm-test-05-p6.ppm" />
+    <None Include="PPMFiles\ppm-test-06-p6.ppm" />
+    <None Include="PPMFiles\ppm-test-07-p3-big.ppm" />
+    <None Include="PPMFiles\ppm-test-08-p6-big.ppm" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -137,8 +146,9 @@
   <ItemGroup>
     <Resource Include="Icons\rectangle.png" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="PPMFiles\" />
+    <Resource Include="PPMFiles\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
