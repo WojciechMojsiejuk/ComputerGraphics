@@ -27,16 +27,7 @@ namespace ComputerGraphics
         /// 
         /// </exception>
         /// <param name="binaryReader"></param>
-        public static void OmmitLine(this BinaryReader binaryReader)
-        {
-            while(true)
-            {
-                if (binaryReader.ReadChar() == '\n')
-                {
-                    break;
-                }
-            }
-        }
+        
         public static bool In<T>(this T x, params T[] set)
         {
             return set.Contains(x);
@@ -64,7 +55,10 @@ namespace ComputerGraphics
     public class PPMReader
     {
         const int MAX_FILE_SIZE = 99999;
-        const int BUFFER_SIZE = 64;
+        const int BUFFER_SIZE = 4096;
+        const char LF = '\n';
+        const char HASH = '#';
+
         enum Mode : int
         {
             ONEBYTE = 255,
@@ -99,6 +93,7 @@ namespace ComputerGraphics
         uint BufferIndex { get; set; } = 0;
         char[] Buffer;
         bool IncompleteReading { get; set; }
+        bool IncompleteComment { get; set; }
         enum Color : int
         {
             R = 0,
@@ -126,7 +121,7 @@ namespace ComputerGraphics
                     heightString.Capacity = 5;
 
                     // Read the stream as a string, and write the string to the console.
-                    binaryReader = new BinaryReader(fs);
+                    binaryReader = new BinaryReader(fs, new ASCIIEncoding());
                     fileIdentifier[0] = binaryReader.ReadChar();
                     fileIdentifier[1] = binaryReader.ReadChar();
 
@@ -180,7 +175,7 @@ namespace ComputerGraphics
                        Height,
                        96,
                        96,
-                       PixelFormats.Rgb24,
+                       PixelFormats.Bgr32,
                        null);
 
             while (!binaryReader.EOF())
@@ -254,6 +249,18 @@ namespace ComputerGraphics
             while (!binaryReader.EOF())
             {
                 char propertyChar = binaryReader.ReadChar();
+                if (propertyChar == '#')
+                {
+                    //Omit comment
+                    while(true)
+                    {
+                        propertyChar = binaryReader.ReadChar();
+                        if (propertyChar == LF)
+                            break;
+                    }
+                    continue;
+                    
+                }
                 if ((propertyChar.In(p3CharValues) == false) && (foundFirstChar == false))
                     continue;
                 else if ((propertyChar.In(p3CharValues) == false) && (foundFirstChar == true))
@@ -304,6 +311,25 @@ namespace ComputerGraphics
             while (BufferIndex != Buffer.Length)
             {
                 char propertyChar = Buffer[BufferIndex];
+                if (propertyChar == '#' || IncompleteComment)
+                {
+                    while(BufferIndex != Buffer.Length)
+                    {
+                        IncompleteComment = true;
+                        propertyChar = Buffer[BufferIndex];
+                        if(propertyChar == (char)0x0A)
+                        {
+                            IncompleteComment = false;
+                            break;
+                        }
+                        BufferIndex++;
+                    }
+                    if (!IncompleteComment)
+                        continue;
+                    else
+                        break;
+
+                }
                 if ((propertyChar.In(p3CharValues) == false) && (foundFirstChar == false))
                 { 
                     if(IncompleteReading)
@@ -355,12 +381,12 @@ namespace ComputerGraphics
 
                     // Find the address of the pixel to draw.
                     pBackBuffer += Y * writeableBitmap.BackBufferStride;
-                    pBackBuffer += X * 3;
+                    pBackBuffer += X * 4;
 
                     // Compute the pixel's color.
-                    int color_data = b<< 16; // B
+                    int color_data = r << 16; // R
                     color_data |= g << 8;   // G
-                    color_data |= r << 0;   // R
+                    color_data |= b << 0;   // B
 
                     // Assign the color data to the pixel.
                     *((int*)pBackBuffer) = color_data;
