@@ -172,13 +172,28 @@ namespace ComputerGraphics
 
         public BitmapImage readPPM3()
         {
-            writeableBitmap = new WriteableBitmap(
-                       Width,
-                       Height,
-                       96,
-                       96,
-                       PixelFormats.Rgb24,
-                       null);
+            if(format == PPMFormat.P3)
+            {
+
+                writeableBitmap = new WriteableBitmap(
+                           Width,
+                           Height,
+                           96,
+                           96,
+                           PixelFormats.Rgb24,
+                           null);
+            }
+            else
+            {
+
+                writeableBitmap = new WriteableBitmap(
+                           Width,
+                           Height,
+                           96,
+                           96,
+                           PixelFormats.Rgb48,
+                           null);
+            }
 
             while (!binaryReader.EOF())
             {
@@ -217,10 +232,28 @@ namespace ComputerGraphics
                                 GValue = linearInterpolate((int)GValue);
                                 BValue = linearInterpolate((int)BValue);
                             }
-                            colorData.Add(Convert.ToByte((int)RValue));
-                            colorData.Add(Convert.ToByte((int)GValue));
-                            colorData.Add(Convert.ToByte((int)BValue));
 
+                            if(mode == Mode.ONEBYTE)
+                            {
+                                colorData.Add(Convert.ToByte((int)RValue));
+                                colorData.Add(Convert.ToByte((int)GValue));
+                                colorData.Add(Convert.ToByte((int)BValue));
+                            }
+                            else
+                            {
+                                byte[] Rtemp = BitConverter.GetBytes((int)RValue);
+                                byte[] Gtemp = BitConverter.GetBytes((int)GValue);
+                                byte[] Btemp = BitConverter.GetBytes((int)BValue);
+
+                                colorData.Add(Rtemp[0]);
+                                colorData.Add(Rtemp[1]);
+                                colorData.Add(Gtemp[0]);
+                                colorData.Add(Gtemp[1]);
+                                colorData.Add(Btemp[0]);
+                                colorData.Add(Btemp[1]);
+                            }
+
+                           
                             System.Diagnostics.Debug.WriteLine(RValue);
                             System.Diagnostics.Debug.WriteLine(GValue);
                             System.Diagnostics.Debug.WriteLine(BValue);
@@ -253,6 +286,7 @@ namespace ComputerGraphics
 
         public BitmapImage readPPM6()
         {
+
             writeableBitmap = new WriteableBitmap(
                        Width,
                        Height,
@@ -264,11 +298,10 @@ namespace ComputerGraphics
             while (!binaryReader.EOF())
             {
                 // Read to buffer
-                byte[] byteBuffer = binaryReader.ReadBytes(writeableBitmap.BackBufferStride );
+                byte[] byteBuffer = binaryReader.ReadBytes(writeableBitmap.BackBufferStride);
                 colorData.AddRange(byteBuffer);
-                DrawLine();
-                Y++;
             }
+            DrawPicture();
             binaryReader.Close();
             return writeableBitmap.ToBitmapImage();
         }
@@ -444,6 +477,26 @@ namespace ComputerGraphics
                 {
                    
                      writeableBitmap.WritePixels(new Int32Rect(0, Y, Width, 1), colorData.ToArray(), writeableBitmap.BackBufferStride, 0, Y); 
+                }
+
+            }
+            finally
+            {
+                // Release the back buffer and make it available for display.
+                writeableBitmap.Unlock();
+            }
+        }
+
+        void DrawPicture()
+        {
+            try
+            {
+                // Reserve the back buffer for updates.
+                writeableBitmap.Lock();
+
+                unsafe
+                {
+                    writeableBitmap.WritePixels(new Int32Rect(0, 0, Width, Height), colorData.ToArray(), writeableBitmap.BackBufferStride, 0, 0);
                 }
 
             }
