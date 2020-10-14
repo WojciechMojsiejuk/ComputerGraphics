@@ -13,7 +13,7 @@ namespace ComputerGraphics
 {
     public static class StreamEOF
     {
-        
+
         public static bool EOF(this BinaryReader binaryReader)
         {
             var bs = binaryReader.BaseStream;
@@ -27,7 +27,7 @@ namespace ComputerGraphics
         /// 
         /// </exception>
         /// <param name="binaryReader"></param>
-        
+
         public static bool In<T>(this T x, params T[] set)
         {
             return set.Contains(x);
@@ -67,7 +67,7 @@ namespace ComputerGraphics
 
         Mode mode;
 
-        enum PPMFormat
+        public enum PPMFormat
         {
             P3,
             P6,
@@ -77,7 +77,7 @@ namespace ComputerGraphics
         BitmapImage bitmapImage;
         BinaryReader binaryReader;
         char[] fileIdentifier = new char[2];
-        PPMFormat format;
+        public PPMFormat format;
         StringBuilder maxValueString = new StringBuilder();
         StringBuilder widthString = new StringBuilder();
         StringBuilder heightString = new StringBuilder();
@@ -108,57 +108,59 @@ namespace ComputerGraphics
 
         FileStream fs;
 
+        List<byte> colorData = new List<byte>();
+
         public PPMReader(string filePath)
         {
             try
             {
                 // Open the text file using a stream reader.
                 FileStream fs = File.Open(filePath, FileMode.Open);
-                
-                    //Initialize variables
-                    maxValueString.Capacity = 5;
-                    widthString.Capacity = 5;
-                    heightString.Capacity = 5;
 
-                    // Read the stream as a string, and write the string to the console.
-                    binaryReader = new BinaryReader(fs, new ASCIIEncoding());
-                    fileIdentifier[0] = binaryReader.ReadChar();
-                    fileIdentifier[1] = binaryReader.ReadChar();
+                //Initialize variables
+                maxValueString.Capacity = 5;
+                widthString.Capacity = 5;
+                heightString.Capacity = 5;
 
-                    if(fileIdentifier[0].Equals('P') && fileIdentifier[1].Equals('3'))
+                // Read the stream as a string, and write the string to the console.
+                binaryReader = new BinaryReader(fs, new ASCIIEncoding());
+                fileIdentifier[0] = binaryReader.ReadChar();
+                fileIdentifier[1] = binaryReader.ReadChar();
+
+                if (fileIdentifier[0].Equals('P') && fileIdentifier[1].Equals('3'))
+                {
+                    format = PPMFormat.P3;
+                }
+                else if (fileIdentifier[0].Equals('P') && fileIdentifier[1].Equals('6'))
+                {
+                    format = PPMFormat.P6;
+                }
+                else
+                {
+                    throw new InvalidDataException(String.Format("PPM file header should specify format. Expected P3 or P6, got {0}{1}", fileIdentifier[0], fileIdentifier[1]));
+                }
+                getProperty(widthString);
+                Width = castPropertyToInt(widthString, 1, MAX_FILE_SIZE);
+                getProperty(heightString);
+                Height = castPropertyToInt(heightString, 1, MAX_FILE_SIZE);
+                getProperty(maxValueString);
+                MaxValue = castPropertyToInt(maxValueString, 1, (int)Mode.TWOBYTES);
+                if (MaxValue > (int)Mode.ONEBYTE)
+                {
+                    mode = Mode.TWOBYTES;
+                    if (MaxValue != (int)Mode.TWOBYTES)
                     {
-                        format = PPMFormat.P3;
+                        LinearInterpolation = true;
                     }
-                    else if (fileIdentifier[0].Equals('P') && fileIdentifier[1].Equals('6'))
+                }
+                else
+                {
+                    mode = Mode.ONEBYTE;
+                    if (MaxValue != (int)Mode.ONEBYTE)
                     {
-                        format = PPMFormat.P6;
+                        LinearInterpolation = true;
                     }
-                    else
-                    {
-                        throw new InvalidDataException(String.Format("PPM file header should specify format. Expected P3 or P6, got {0}{1}", fileIdentifier[0], fileIdentifier[1]));
-                    }
-                    getProperty(widthString);
-                    Width = castPropertyToInt(widthString, 1, MAX_FILE_SIZE);
-                    getProperty(heightString);
-                    Height = castPropertyToInt(heightString, 1, MAX_FILE_SIZE);
-                    getProperty(maxValueString);
-                    MaxValue = castPropertyToInt(maxValueString, 1, (int)Mode.TWOBYTES);
-                    if(MaxValue>(int)Mode.ONEBYTE)
-                    {
-                        mode = Mode.TWOBYTES;
-                        if(MaxValue != (int)Mode.TWOBYTES)
-                        {
-                            LinearInterpolation = true;
-                        }
-                    }
-                    else
-                    {
-                        mode = Mode.ONEBYTE;
-                        if (MaxValue != (int)Mode.ONEBYTE)
-                        {
-                            LinearInterpolation = true;
-                        }
-                    }
+                }
             }
             catch (IOException e)
             {
@@ -175,7 +177,7 @@ namespace ComputerGraphics
                        Height,
                        96,
                        96,
-                       PixelFormats.Bgr32,
+                       PixelFormats.Rgb24,
                        null);
 
             while (!binaryReader.EOF())
@@ -215,17 +217,22 @@ namespace ComputerGraphics
                                 GValue = linearInterpolate((int)GValue);
                                 BValue = linearInterpolate((int)BValue);
                             }
+                            colorData.Add(Convert.ToByte((int)RValue));
+                            colorData.Add(Convert.ToByte((int)GValue));
+                            colorData.Add(Convert.ToByte((int)BValue));
 
                             System.Diagnostics.Debug.WriteLine(RValue);
                             System.Diagnostics.Debug.WriteLine(GValue);
                             System.Diagnostics.Debug.WriteLine(BValue);
                             System.Diagnostics.Debug.WriteLine("______________");
 
-                            DrawPixel((int)RValue, (int)GValue, (int)BValue);
-                            X++;
+
+                            //DrawPixel((int)RValue, (int)GValue, (int)BValue);
+                            ++X;
                             if (X == Width)
                             {
-                                Y++;
+                                DrawLine();
+                                ++Y;
                                 X = 0;
                             }
 
@@ -234,10 +241,33 @@ namespace ComputerGraphics
                             BValue = null;
                         }
                     }
-                    
+
                     if (isBufferFinished)
                         break;
                 }
+            }
+            binaryReader.Close();
+            return writeableBitmap.ToBitmapImage();
+        }
+
+
+        public BitmapImage readPPM6()
+        {
+            writeableBitmap = new WriteableBitmap(
+                       Width,
+                       Height,
+                       96,
+                       96,
+                       PixelFormats.Rgb24,
+                       null);
+
+            while (!binaryReader.EOF())
+            {
+                // Read to buffer
+                byte[] byteBuffer = binaryReader.ReadBytes(writeableBitmap.BackBufferStride );
+                colorData.AddRange(byteBuffer);
+                DrawLine();
+                Y++;
             }
             binaryReader.Close();
             return writeableBitmap.ToBitmapImage();
@@ -252,14 +282,14 @@ namespace ComputerGraphics
                 if (propertyChar == '#')
                 {
                     //Omit comment
-                    while(true)
+                    while (true)
                     {
                         propertyChar = binaryReader.ReadChar();
                         if (propertyChar == LF)
                             break;
                     }
                     continue;
-                    
+
                 }
                 if ((propertyChar.In(p3CharValues) == false) && (foundFirstChar == false))
                     continue;
@@ -270,7 +300,7 @@ namespace ComputerGraphics
                 {
                     stringBuilder.Append(propertyChar);
                 }
-                catch(ArgumentOutOfRangeException)
+                catch (ArgumentOutOfRangeException)
                 {
                     throw new ArgumentOutOfRangeException("Image parameter too big");
                 }
@@ -281,7 +311,7 @@ namespace ComputerGraphics
         int castPropertyToInt(StringBuilder stringBuilder, int allowedMin, int allowedMax)
         {
             int property = int.Parse(stringBuilder.ToString());
-            if(property < allowedMin)
+            if (property < allowedMin)
             {
                 throw new InvalidDataException(String.Format("{0} is smaller than allowed min {1}", property, allowedMin));
             }
@@ -313,11 +343,11 @@ namespace ComputerGraphics
                 char propertyChar = Buffer[BufferIndex];
                 if (propertyChar == '#' || IncompleteComment)
                 {
-                    while(BufferIndex != Buffer.Length)
+                    while (BufferIndex != Buffer.Length)
                     {
                         IncompleteComment = true;
                         propertyChar = Buffer[BufferIndex];
-                        if(propertyChar == (char)0x0A)
+                        if (propertyChar == (char)0x0A)
                         {
                             IncompleteComment = false;
                             break;
@@ -331,8 +361,8 @@ namespace ComputerGraphics
 
                 }
                 if ((propertyChar.In(p3CharValues) == false) && (foundFirstChar == false))
-                { 
-                    if(IncompleteReading)
+                {
+                    if (IncompleteReading)
                     {
                         //Last buffer did not finished at white space
                         ColorReady = true;
@@ -361,7 +391,7 @@ namespace ComputerGraphics
                 }
                 BufferIndex++;
             }
-            if(foundFirstChar)
+            if (foundFirstChar)
                 IncompleteReading = true;
             return true;
         }
@@ -394,6 +424,28 @@ namespace ComputerGraphics
 
                 // Specify the area of the bitmap that changed.
                 writeableBitmap.AddDirtyRect(new Int32Rect(X, Y, 1, 1));
+            }
+            finally
+            {
+                // Release the back buffer and make it available for display.
+                writeableBitmap.Unlock();
+            }
+        }
+
+        [STAThread]
+        void DrawLine()
+        {
+            try
+            {
+                // Reserve the back buffer for updates.
+                writeableBitmap.Lock();
+
+                unsafe
+                {
+                   
+                     writeableBitmap.WritePixels(new Int32Rect(0, Y, Width, 1), colorData.ToArray(), writeableBitmap.BackBufferStride, 0, Y); 
+                }
+
             }
             finally
             {

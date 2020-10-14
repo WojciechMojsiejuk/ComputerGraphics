@@ -343,3 +343,4 @@ healthchecksdb
 *.ppm
 *jpg
 *jpeg
+*.png

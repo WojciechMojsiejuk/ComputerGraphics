@@ -85,14 +85,17 @@ namespace ComputerGraphics
         private void OpenPPMFile(string fileName)
         {
             PPMReader ppmReader= new PPMReader(fileName);
-            BitmapImg = ppmReader.readPPM3();
+            if (ppmReader.format == PPMReader.PPMFormat.P3)
+                BitmapImg = ppmReader.readPPM3();
+            else if (ppmReader.format == PPMReader.PPMFormat.P6) 
+                BitmapImg = ppmReader.readPPM6();
         }
 
         private void SaveFile(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.InitialDirectory = Environment.CurrentDirectory;
-            saveFileDialog.Filter = "Image files (*.jpg)|*.jpg";
+            saveFileDialog.Filter = "JPG files (*.jpg)|*.jpg|Png files (*.png)|*.png";
             if (saveFileDialog.ShowDialog() == true)
             {
                 var fileExtension = System.IO.Path.GetExtension(saveFileDialog.FileName);
@@ -108,6 +111,16 @@ namespace ComputerGraphics
                         }   
                         catch(InvalidDataException ide)
                             {
+                            MessageBox.Show(ide.ToString(), "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        break;
+                    case ".png":
+                        try
+                        {
+                            SavePNGFile(saveFileDialog.FileName);
+                        }
+                        catch (InvalidDataException ide)
+                        {
                             MessageBox.Show(ide.ToString(), "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                         break;
@@ -151,6 +164,26 @@ namespace ComputerGraphics
             {
                 MessageBox.Show("No file compression quality selected", "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void SavePNGFile(string fileName)
+        {
+            if (BitmapImg == null)
+                throw new InvalidDataException("No file to save.");
+
+            PngBitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(BitmapImg));
+            using (var fileStream = new FileStream(fileName, System.IO.FileMode.Create))
+            {
+                try
+                {
+                    encoder.Save(fileStream);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }     
         }
 
         private void SelectOperation(object sender, RoutedEventArgs e)
