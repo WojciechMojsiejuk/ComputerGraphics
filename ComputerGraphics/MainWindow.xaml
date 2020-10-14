@@ -12,20 +12,33 @@
         <RoutedUICommand x:Key="CreateObjectCommand" Text="Create figure" />
         <RoutedUICommand x:Key="OpenFileCommand" Text="OpenFile" />
         <RoutedUICommand x:Key="SaveFileCommand" Text="SaveFile" />
+        <RoutedUICommand x:Key="NewCanvasCommand" Text="NewCanvas" />
+        
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command ="{StaticResource SelectOperationCommand}" Executed="SelectOperation" />
         <CommandBinding Command ="{StaticResource CreateObjectCommand}" Executed="CreateObject" />
+        <CommandBinding Command ="{StaticResource NewCanvasCommand}" Executed="CreateNewCanvas" />
         <CommandBinding Command ="{StaticResource OpenFileCommand}" Executed="OpenFile" />
         <CommandBinding Command ="{StaticResource SaveFileCommand}" Executed="SaveFile" />
     </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Path=OpenFileCommand}" 
+                Key="O" 
+                Modifiers="Control"/>
+        <KeyBinding Command="{Binding Path=NewCanvasCommand}" 
+                Key="N" 
+                Modifiers="Control"/>
+    </Window.InputBindings>
+
     <Grid>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open" Command="{StaticResource OpenFileCommand}"/>
-                    <MenuItem Header="_Save" Command="{StaticResource SaveFileCommand}"/>
+                    <MenuItem Header="_Open" Command="{StaticResource OpenFileCommand}" />
+                    <MenuItem Header="_Save" Command="{StaticResource SaveFileCommand}" />
                     <MenuItem Header="_Close"/>
+                    <MenuItem Header="_New canvas" Command="{StaticResource NewCanvasCommand}" />
                 </MenuItem> 
             </Menu>
             <ToolBarTray DockPanel.Dock="Left" Orientation="Vertical">
@@ -61,7 +74,7 @@
                 </ToolBar>
             </ToolBarTray>
             <Viewbox Stretch="Uniform">
-                <Canvas x:Name="imageCanvas" MouseDown="Canvas_MouseDown" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" Width="auto" Height="auto" Background="LightBlue"/>
+                <Canvas x:Name="imageCanvas" MouseDown="Canvas_MouseDown" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" Width="500" Height="600" Background="LightBlue"/>
             </Viewbox>
             <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Header="Property">
                 <Grid x:Name="rightPanel" Height="Auto" Width="Auto">

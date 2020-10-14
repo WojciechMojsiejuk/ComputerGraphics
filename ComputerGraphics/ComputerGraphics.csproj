@@ -72,9 +72,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CGEllipse.cs" />
-    <Compile Include="CGLine.cs" />
-    <Compile Include="CGObject.cs" />
+    <Compile Include="CGobjects\CGEllipse.cs" />
+    <Compile Include="CGobjects\CGLine.cs" />
+    <Compile Include="CGobjects\CGObject.cs" />
     <Compile Include="PPMReader.cs" />
     <Compile Include="SelectImageQualityDialog.xaml.cs">
       <DependentUpon>SelectImageQualityDialog.xaml</DependentUpon>
@@ -87,7 +87,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CGRectangle.cs" />
+    <Compile Include="CGobjects\CGRectangle.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

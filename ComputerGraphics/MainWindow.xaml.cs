@@ -54,6 +54,14 @@ namespace ComputerGraphics
         {
             return imageCanvas;
         }
+        private void CreateNewCanvas(object sender, RoutedEventArgs e)
+        {
+            imageCanvas = new Canvas();
+            imageCanvas.Width = 550;
+            imageCanvas.Height = 650;
+            imageCanvas.Background = new SolidColorBrush(Colors.LightBlue);
+            imageCanvas.UpdateLayout();
+        }
 
         private void OpenFile(object sender, RoutedEventArgs e)
         {
