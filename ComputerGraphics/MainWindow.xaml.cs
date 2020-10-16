@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ComputerGraphics.CGobjects;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -286,6 +287,11 @@ namespace ComputerGraphics
                     imageCanvas.Children.Add(selectedObject.ObjectShape);
                     break;
                 case "BezierCurve":
+                    BezierCurve bezierCurve = new BezierCurve(new Ellipse());
+                    objectsList.Add(bezierCurve);
+                    selectedObject = bezierCurve;
+                    imageCanvas.Children.Add(selectedObject.ObjectShape);
+                    imageCanvas.Children.Add(bezierCurve.ControlPointsPath);
                     break;
                 case "Polygon":
                     break;

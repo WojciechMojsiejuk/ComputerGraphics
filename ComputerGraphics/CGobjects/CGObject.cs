@@ -15,7 +15,7 @@ using Xceed.Wpf.Toolkit;
 
 namespace ComputerGraphics
 {
-    abstract class CGObject : INotifyPropertyChanged
+    public abstract class CGObject : INotifyPropertyChanged
     {
         public SolidColorBrush inactiveObjectColor =  new SolidColorBrush(Colors.Black);
         public SolidColorBrush activeObjectColor = new SolidColorBrush(Colors.Blue);
@@ -116,7 +116,7 @@ namespace ComputerGraphics
             ObjectShape.Stroke = inactiveObjectColor;
             IsSelected = false;
         }
-        public CGObject selectMouseDown(object sender, MouseButtonEventArgs e)
+        public virtual CGObject selectMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (IsSelected)
                 return this;

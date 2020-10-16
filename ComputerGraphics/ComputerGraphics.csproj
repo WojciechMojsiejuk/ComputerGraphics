@@ -72,9 +72,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CGobjects\BezierCurve.cs" />
     <Compile Include="CGobjects\CGEllipse.cs" />
     <Compile Include="CGobjects\CGLine.cs" />
     <Compile Include="CGobjects\CGObject.cs" />
+    <Compile Include="CGobjects\CGPoint.cs" />
     <Compile Include="PPMReader.cs" />
     <Compile Include="SelectImageQualityDialog.xaml.cs">
       <DependentUpon>SelectImageQualityDialog.xaml</DependentUpon>

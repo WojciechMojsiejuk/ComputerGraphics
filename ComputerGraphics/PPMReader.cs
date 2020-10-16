@@ -172,7 +172,7 @@ namespace ComputerGraphics
 
         public BitmapImage readPPM3()
         {
-            if(format == PPMFormat.P3)
+            if(mode == Mode.ONEBYTE)
             {
 
                 writeableBitmap = new WriteableBitmap(
@@ -476,7 +476,7 @@ namespace ComputerGraphics
                 unsafe
                 {
                    
-                     writeableBitmap.WritePixels(new Int32Rect(0, Y, Width, 1), colorData.ToArray(), writeableBitmap.BackBufferStride, 0, Y); 
+                     writeableBitmap.WritePixels(new Int32Rect(0, Y, Width, 1), colorData.ToArray(), Width*3, 0, Y); 
                 }
 
             }
