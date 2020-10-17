@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -11,17 +12,23 @@ using System.Windows.Shapes;
 
 namespace ComputerGraphics.CGobjects
 {
+    static class ListExtension
+    {
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) => self.Select((item, index) => (item, index));
+    }
+
     class BezierCurve : CGObject
     {
         public ObservableCollection<CGPoint> landmarks = new ObservableCollection<CGPoint>();
         public bool FirstElemInitalization { get; set; } = true;
 
+        PathFigure controlPointsFigure = new PathFigure();
         PathFigure bezierFigure = new PathFigure();
 
         public Path ControlPointsPath = new Path();
         public Path BezierCurvePath = new Path();
 
-        const int STEP = 100;
+        const int STEP = 20;
 
 
         public BezierCurve(Shape shape):base(shape)
@@ -103,6 +110,35 @@ namespace ComputerGraphics.CGobjects
         {
             System.Diagnostics.Debug.WriteLine("Point of bezier curve changed");
             DrawBezierCurve();
+            //DrawBezierCurveControlPath();
+        }
+
+        void DrawBezierCurveControlPath()
+        {
+            controlPointsFigure.StartPoint = landmarks[0].Point;
+
+
+            PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
+
+            for (int index = 1; index < landmarks.Count; index++)
+            {
+                LineSegment myLineSegment = new LineSegment();
+                myLineSegment.Point = landmarks[index].Point;
+                myPathSegmentCollection.Add(myLineSegment);
+            }
+
+            controlPointsFigure.Segments = myPathSegmentCollection;
+
+            PathFigureCollection myPathFigureCollection = new PathFigureCollection();
+            myPathFigureCollection.Add(controlPointsFigure);
+
+            PathGeometry myPathGeometry = new PathGeometry();
+            myPathGeometry.Figures = myPathFigureCollection;
+
+            ControlPointsPath.Stroke = Brushes.BlanchedAlmond;
+            ControlPointsPath.StrokeThickness = 1;
+            ControlPointsPath.StrokeDashArray = new DoubleCollection(new List<double>() { 4, 4 });
+            ControlPointsPath.Data = myPathGeometry;
         }
 
         void DrawBezierCurve()
@@ -112,10 +148,10 @@ namespace ComputerGraphics.CGobjects
 
             PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
 
-            for(int index = 1; index < landmarks.Count; index++)
+            foreach(var elem in BezierCurveRange())
             {
                 LineSegment myLineSegment = new LineSegment();
-                myLineSegment.Point = landmarks[index].Point;
+                myLineSegment.Point = elem;
                 myPathSegmentCollection.Add(myLineSegment);
             }
 
@@ -127,10 +163,35 @@ namespace ComputerGraphics.CGobjects
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
 
-            ControlPointsPath.Stroke = Brushes.BlanchedAlmond;
-            ControlPointsPath.StrokeThickness = 1;
-            ControlPointsPath.StrokeDashArray = new DoubleCollection(new List<double>(){4,4});
-            ControlPointsPath.Data = myPathGeometry;
+            BezierCurvePath.Stroke = Brushes.Black;
+            BezierCurvePath.StrokeThickness = 1;
+            BezierCurvePath.StrokeDashArray = new DoubleCollection(new List<double>(){4,4});
+            BezierCurvePath.Data = myPathGeometry;
+        }
+
+        Point Bezier(double t)
+        {
+            int n = landmarks.Count-1;
+            Point point = new Point();
+            point.X = 0;
+            point.Y = 0;
+
+            foreach (var (item, index) in landmarks.WithIndex())
+            {
+                double bern = BernsteinPolynomial(t, index, n);
+                point.X += item.Point.X * bern;
+                point.Y += item.Point.Y * bern;
+            }
+            return point;
+        }
+
+        IEnumerable<Point> BezierCurveRange()
+        {
+            foreach (int i in Enumerable.Range(0,STEP))
+            {
+                double t = i / (double)(STEP-1);
+                yield return Bezier(t);
+            } 
         }
 
         public override void createMouseMove(object sender, MouseEventArgs e)
