@@ -110,7 +110,7 @@ namespace ComputerGraphics.CGobjects
         {
             System.Diagnostics.Debug.WriteLine("Point of bezier curve changed");
             DrawBezierCurve();
-            //DrawBezierCurveControlPath();
+            DrawBezierCurveControlPath();
         }
 
         void DrawBezierCurveControlPath()
@@ -165,7 +165,6 @@ namespace ComputerGraphics.CGobjects
 
             BezierCurvePath.Stroke = Brushes.Black;
             BezierCurvePath.StrokeThickness = 1;
-            BezierCurvePath.StrokeDashArray = new DoubleCollection(new List<double>(){4,4});
             BezierCurvePath.Data = myPathGeometry;
         }
 

@@ -292,6 +292,7 @@ namespace ComputerGraphics
                     selectedObject = bezierCurve;
                     imageCanvas.Children.Add(selectedObject.ObjectShape);
                     imageCanvas.Children.Add(bezierCurve.ControlPointsPath);
+                    imageCanvas.Children.Add(bezierCurve.BezierCurvePath);
                     break;
                 case "Polygon":
                     break;
